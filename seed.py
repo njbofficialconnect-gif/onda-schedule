@@ -22,9 +22,9 @@ from models import User, Event
 from auth import hash_password
 
 PEOPLE = [
-    {"username": "hyungi", "display_name": "박현기", "position": "대표"},
-    {"username": "siwon", "display_name": "변시원", "position": "전무이사"},
-    {"username": "hyunwoo", "display_name": "박현우", "position": "부대표"},
+    {"username": "onda1", "display_name": "박현기", "position": "대표"},
+    {"username": "onda3", "display_name": "변시원", "position": "전무이사"},
+    {"username": "onda2", "display_name": "박현우", "position": "부대표"},
 ]
 
 # (category, title, start_date, end_date) - 온다_통합일정표.xlsx 2026.09~11 기준

@@ -13,9 +13,9 @@ CATEGORIES = {
 
 # 개인 일정 카테고리 -> 담당자로 지정될 계정의 username
 PERSON_CATEGORY_USERNAME = {
-    "ceo": "hyungi",
-    "director": "siwon",
-    "vp": "hyunwoo",
+    "ceo": "onda1",       # 박현기 대표
+    "director": "onda3",  # 변시원 전무이사
+    "vp": "onda2",        # 박현우 부대표
 }
 
 CATEGORY_ORDER = ["youtube", "ceo", "director", "vp", "event", "meeting", "contract"]
