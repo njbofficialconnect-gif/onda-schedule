@@ -155,3 +155,27 @@ body {
 /* FullCalendar 이벤트가 너무 얇지 않게 */
 .fc-event { cursor: pointer; font-size: 12px; }
 .fc-daygrid-event { padding: 2px 4px; }
+
+/* ---------- 모바일 (휴대폰 화면) ---------- */
+html, body { overflow-x: hidden; }
+
+@media (max-width: 860px) {
+  .topbar { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+  .topbar-title { font-size: 15px; }
+  .topbar-user { font-size: 12px; gap: 10px; flex-wrap: wrap; }
+
+  .layout { flex-direction: column; min-height: 0; }
+  .sidebar {
+    width: 100%; border-right: none; border-bottom: 1px solid var(--border);
+    padding: 12px; display: flex; flex-direction: column;
+  }
+  .sidebar-section { margin-top: 12px; }
+  #category-filters { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .cat-filter { padding: 3px 0; }
+
+  .calendar-wrap { padding: 10px; }
+  #calendar { padding: 8px; }
+
+  .modal { width: 94vw; }
+  .form-row { flex-direction: column; gap: 0; }
+}
