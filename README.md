@@ -96,9 +96,71 @@ python app.py
 홈 화면에 ONDA 아이콘이 생기고, 탭하면 주소창 없이 앱처럼 전체화면으로 실행됩니다.
 (localhost가 아닌 실제 도메인으로 배포할 때는 HTTPS가 필요합니다 — 아래 5-1 참고.)
 
-## 6. 배포 (선택)
+## 6. 배포하기 (Render + Neon)
 
-Heroku 등 `Procfile`을 지원하는 플랫폼에 그대로 올릴 수 있습니다. 배포 환경에서는
-`DATABASE_URL` 환경변수를 PostgreSQL 등으로 지정하면 SQLite 대신 그쪽을 사용합니다.
-휴대폰에서 "홈 화면에 추가"로 설치하려면(위 5번) 배포 주소가 HTTPS여야 하고,
-`APP_BASE_URL`과 `KAKAO_REDIRECT_URI`도 그 주소로 맞춰서 바꿔주세요.
+테니스토리 프로젝트와 같은 방식(Render.com + PostgreSQL)으로 배포합니다. 로컬의 SQLite
+파일은 서버가 재시작될 때마다 초기화되는 호스팅이 많아서, 등록한 일정이 사라지지 않도록
+처음부터 영구 저장되는 PostgreSQL을 씁니다.
+
+### 6-1. GitHub에 올리기
+
+이 폴더는 이미 git 저장소로 초기화되어 있고 첫 커밋도 되어 있습니다. GitHub에
+`onda-schedule`이라는 이름으로 빈 저장소를 하나 만든 뒤(https://github.com/new,
+"Initialize with README" 체크 해제) 아래처럼 연결해서 올리면 됩니다.
+
+```bash
+git remote add origin https://github.com/njbofficialconnect-gif/onda-schedule.git
+git push -u origin main
+```
+
+### 6-2. 무료 PostgreSQL 만들기 (Neon)
+
+1. [neon.tech](https://neon.tech) 가입 → 프로젝트 생성 (이름 예: onda)
+2. 생성되면 보여주는 **Connection string**을 복사 (`postgresql://...` 형태)
+   — 이게 `DATABASE_URL`에 넣을 값입니다.
+
+(Supabase의 PostgreSQL을 대신 써도 됩니다 — 테니스토리 README에 있는 것과 동일한 방식)
+
+### 6-3. Render에 배포하기
+
+1. [render.com](https://render.com) 가입/로그인 (테니스토리와 같은 계정이면 그대로 사용)
+2. **New > Web Service** → 위에서 올린 `onda-schedule` GitHub 저장소 선택
+3. 설정:
+   - **Runtime**: Python 3
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn app:app`
+4. **Environment** 탭에서 아래 값들을 추가:
+
+   | 키 | 값 |
+   |---|---|
+   | `DATABASE_URL` | 6-2에서 복사한 Neon connection string |
+   | `FLASK_SECRET_KEY` | 아무 긴 임의의 문자열 |
+   | `GMAIL_ADDRESS` | `njb.official.connect@gmail.com` |
+   | `GMAIL_APP_PASSWORD` | 발급받은 구글 앱 비밀번호 |
+   | `APP_BASE_URL` | 배포되면 알려주는 주소 (예: `https://onda-schedule.onrender.com`) |
+   | `KAKAO_REST_API_KEY` | 카카오 개발자센터에서 발급받은 키 (안 쓰면 생략 가능) |
+   | `KAKAO_REDIRECT_URI` | `{APP_BASE_URL}/kakao/callback` |
+
+   `APP_BASE_URL`은 배포가 한 번 끝나서 실제 주소를 알게 된 뒤에 채우고, 저장하면
+   Render가 자동으로 재배포합니다.
+5. **Create Web Service** → 몇 분 후 배포 완료, 주소로 접속하면 로그인 화면이 뜹니다.
+
+### 6-4. 계정 만들기 + 초기 일정 넣기 (배포된 DB에 한 번만)
+
+Render 대시보드의 해당 서비스 → **Shell** 탭을 열고 아래 명령 한 번만 실행합니다.
+
+```bash
+python seed.py
+```
+
+로컬에서 했던 것과 똑같이 3명의 로그인 계정과 초기 일정이 만들어집니다. 임시
+비밀번호가 여기서도 한 번만 출력되니 꼭 적어두세요.
+
+### 6-5. 카카오/휴대폰 설치 마무리
+
+- 카카오톡 알림을 쓴다면, 카카오 개발자센터의 Redirect URI에
+  `https://onda-schedule.onrender.com/kakao/callback`(배포 주소 기준)을 추가로 등록하세요.
+- Render는 기본으로 HTTPS를 제공하므로, 배포 주소로 휴대폰에서 접속해 "홈 화면에 추가"하면
+  바로 PWA로 설치됩니다 (위 5번 참고).
+- Render 무료 플랜은 일정 시간 요청이 없으면 슬립 상태가 되어 첫 접속이 느릴 수 있습니다.
+  계속 켜져 있어야 한다면 유료 플랜(Starter 등)으로 올리는 걸 권장합니다.
